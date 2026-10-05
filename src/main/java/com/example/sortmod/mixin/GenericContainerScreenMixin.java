@@ -20,18 +20,19 @@ public abstract class GenericContainerScreenMixin extends HandledScreen<GenericC
         super(handler, inventory, title);
     }
 
-    @Inject(method = "init", at = @At("TAIL"))
+    // Переопределяем init() в миксине или указываем правильный селектор
+    @Inject(method = "init()V", at = @At("TAIL"))
     private void addSortButton(CallbackInfo ci) {
         int buttonWidth = 38;
         int buttonHeight = 12;
-        int x = this.x + this.backgroundWidth - buttonWidth - 6;
-        int y = this.y + 4;
+        int btnX = this.x + this.backgroundWidth - buttonWidth - 6;
+        int btnY = this.y + 4;
 
         this.addDrawableChild(
                 ButtonWidget.builder(Text.literal("Sort"), button -> {
                     ClientPlayNetworking.send(new SortPacketPayload());
                 })
-                .dimensions(x, y, buttonWidth, buttonHeight)
+                .dimensions(btnX, btnY, buttonWidth, buttonHeight)
                 .build()
         );
     }
