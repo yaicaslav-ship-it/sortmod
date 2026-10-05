@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "sortmod",
+  "version": "${version}",
+  "name": "Chest Sorter",
+  "description": "Sorts chest inventories with a single click",
+  "authors": [
+    "Developer"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/"
+  },
+  "license": "MIT",
+  "icon": "assets/sortmod/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.example.sortmod.SortMod"
+    ],
+    "client": [
+      "com.example.sortmod.client.SortModClient"
+    ]
+  },
+  "mixins": [
+    "sortmod.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.4",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
