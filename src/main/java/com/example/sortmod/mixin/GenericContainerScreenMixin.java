@@ -13,23 +13,24 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(GenericContainerScreen.class)
-public abstract class GenericContainerScreenMixin extends HandledScreen<GenericContainerScreenHandler> {
-
-    public GenericContainerScreenMixin(GenericContainerScreenHandler handler, PlayerInventory inventory, Text title) {
-        super(handler, inventory, title);
-    }
+@Mixin(HandledScreen.class)
+public abstract class GenericContainerScreenMixin {
 
     @Inject(method = "init", at = @At("TAIL"))
     private void addSortButton(CallbackInfo ci) {
+        // Проверяем, что открыт именно сундук/контейнер, а не любой другой инвентарь
+        if (!((Object) this instanceof GenericContainerScreen containerScreen)) {
+            return;
+        }
+
         int buttonWidth = 36;
         int buttonHeight = 16;
 
-        // Размещаем кнопку слева от окна инвентаря
-        int btnX = this.x - buttonWidth - 3;
-        int btnY = this.y + 6;
+        // Координаты: слева от рамки сундука
+        int btnX = containerScreen.x - buttonWidth - 3;
+        int btnY = containerScreen.y + 6;
 
-        this.addDrawableChild(
+        containerScreen.addDrawableChild(
                 ButtonWidget.builder(Text.literal("Sort"), button -> {
                     ClientPlayNetworking.send(new SortPacketPayload());
                 })
