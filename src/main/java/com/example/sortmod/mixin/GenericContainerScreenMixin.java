@@ -1,11 +1,11 @@
 package com.example.sortmod.mixin;
 
-import com.example.sortmod.network.SortPacketPayload;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import com.example.sortmod.client.ChestSorterExecutor;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,13 +23,15 @@ public abstract class GenericContainerScreenMixin<T extends ScreenHandler> exten
     @Shadow
     protected int y;
 
+    @Shadow
+    protected T handler;
+
     protected GenericContainerScreenMixin(Text title) {
         super(title);
     }
 
     @Inject(method = "init", at = @At("TAIL"))
     private void addSortButton(CallbackInfo ci) {
-        // Проверяем, что открыт именно сундук/контейнер
         if (!((Object) this instanceof GenericContainerScreen)) {
             return;
         }
@@ -37,13 +39,15 @@ public abstract class GenericContainerScreenMixin<T extends ScreenHandler> exten
         int buttonWidth = 36;
         int buttonHeight = 16;
 
-        // Координаты слева от рамки контейнера
+        // Размещаем кнопку слева снаружи рамки сундука
         int btnX = this.x - buttonWidth - 3;
         int btnY = this.y + 6;
 
         this.addDrawableChild(
                 ButtonWidget.builder(Text.literal("Sort"), button -> {
-                    ClientPlayNetworking.send(new SortPacketPayload());
+                    if (this.handler instanceof GenericContainerScreenHandler containerHandler) {
+                        ChestSorterExecutor.startSorting(containerHandler);
+                    }
                 })
                 .dimensions(btnX, btnY, buttonWidth, buttonHeight)
                 .build()
